@@ -70,7 +70,7 @@ Lo script gestisce le seguenti abbreviazioni delle regioni:
 - `FRIULI` viene convertito in `FRIULI-VENEZIA-GIULIA`
 
 ## Licenza
-Questo progetto è concesso in licenza sotto la Licenza GNU General Public License v3. Consulta il file `LICENSE` per ulteriori dettagli.
+Questo progetto è concesso in licenza sotto la Licenza MIT. Consulta il file `LICENSE` per ulteriori dettagli.
 
 ## Disclaimer
 I dati vengono scaricati dal servizio cartografico dell'Agenzia delle Entrate. Assicurati di rispettare eventuali termini e condizioni applicabili durante l'utilizzo dei dati.
