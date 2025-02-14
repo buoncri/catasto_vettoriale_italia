@@ -1,2 +1,16 @@
+# .gitignore
 catasto_vettoriale_italia/
+catasto_italia
 Pipfile.lock
+requests_cache.sqlite
+
+*.zip
+*.ZIP
+
+# Flask files...
+/gui_version/requests
+/gui_version/shutil
+/gui_version/zipfile
+
+log_storage.pkl
+/gui_version/log_storage.pkl
