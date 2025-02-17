@@ -11,6 +11,10 @@ requests_cache.sqlite
 /gui_version/requests
 /gui_version/shutil
 /gui_version/zipfile
+/gui_version/os
+/gui_version/threading
+
+
 
 log_storage.pkl
 /gui_version/log_storage.pkl
