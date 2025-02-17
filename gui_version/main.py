@@ -7,7 +7,12 @@ import pickle
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 
-app = Flask(__name__, template_folder='template')
+app = Flask(
+    __name__, 
+    static_folder="catasto_italia", 
+    static_url_path="/static", 
+    template_folder='template'
+)
 
 class LogManager:
     _instance = None
@@ -129,15 +134,15 @@ def process_gml(root_dir, fogli_dir, mappali_dir):
                 file_path = os.path.join(root, file)
                 try:
                     if "_ple.gml" in file:
-                        dest = os.path.join(fogli_dir, file)
+                        dest = os.path.join(mappali_dir, file)  # Invertito
                         shutil.copy2(file_path, dest)
                         total_gml += 1
-                        log_manager.append(f"Copiato foglio: {file}")
+                        log_manager.append(f"Copiato mappale: {file}")  # Invertito
                     elif "_map.gml" in file:
-                        dest = os.path.join(mappali_dir, file)
+                        dest = os.path.join(fogli_dir, file)  # Invertito
                         shutil.copy2(file_path, dest)
                         total_gml += 1
-                        log_manager.append(f"Copiato mappale: {file}")
+                        log_manager.append(f"Copiato foglio: {file}")  # Invertito
                 except Exception as e:
                     log_manager.append(f"Errore nella copia di {file}: {str(e)}")
     return total_gml
@@ -256,6 +261,25 @@ def cleanup_directories():
         return jsonify(success=False, error=str(e))
 
 
+@app.route("/files", methods=["GET"])
+def list_gml_files():
+    gml_files = []
+    fogli_path = "catasto_italia/fogli"
+    mappali_path = "catasto_italia/mappali"
+    try:
+        if os.path.exists(fogli_path):
+            for file in sorted(os.listdir(fogli_path)):
+                gml_files.append({"url": f"/static/fogli/{file}", "type": "fogli"})
+        if os.path.exists(mappali_path):
+            for file in sorted(os.listdir(mappali_path)):
+                gml_files.append({"url": f"/static/mappali/{file}", "type": "mappali"})
+        log_manager.append(f"File GML trovati: {gml_files}")
+    except Exception as e:
+        gml_files = []
+        log_manager.append(f"Errore nel leggere i file: {str(e)}")
+    return render_template("files.html", gml_files=gml_files)
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -265,6 +289,7 @@ def index():
     return render_template("index.html", log_messages=log_manager.get_logs())
 
 
-
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(
+        debug=False, 
+    )

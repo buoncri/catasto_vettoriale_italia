@@ -98,6 +98,10 @@
                             <progress id="downloadProgress" class="progress is-primary" value="0" max="100" style="display:none"></progress>
                             <pre id="logContent"></pre>
                         </div>
+                        <div class="buttons" style="margin-top: 1rem;">
+                            <button class="button is-info" onclick="copyLogs()">Copia Log</button>
+                            <a class="button is-link" href="/files">Visualizza Risultato</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,6 +174,15 @@
                         }
                     });
             }
+        }
+
+        function copyLogs() {
+            const logContent = document.getElementById('logContent').innerText;
+            navigator.clipboard.writeText(logContent).then(() => {
+                alert('Log copiati negli appunti.');
+            }).catch(err => {
+                alert('Errore durante la copia: ' + err);
+            });
         }
 
         // Aggiorna i log ogni secondo

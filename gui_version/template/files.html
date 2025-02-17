@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Mappa Geometrie Catasto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        #map { height: 600px; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <!-- Leaflet-omnivore per caricare GML -->
+    <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.4/leaflet-omnivore.min.js"></script>
+    <script>
+        // Inizializza la mappa centrata sull'Italia
+        var map = L.map('map').setView([42, 12], 6);
+
+        // Aggiunge le tessere di OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        console.log("Mappa di base di OpenStreetMap caricata correttamente.");
+
+        // Lista dei file GML, passati dal backend come variabile 'gml_files'
+        var files = {{ gml_files | tojson }};
+        console.log("File GML da caricare:", files);
+
+        // Filtra i file per mostrare solo quelli della cartella "mappali"
+        var mappaliFiles = files.filter(function(fileObj) {
+            return fileObj.type === "mappali";
+        });
+
+        // Carica i file GML della cartella "mappali"
+        mappaliFiles.forEach(function(fileObj) {
+            console.log("Caricamento file GML:", fileObj.url);
+            omnivore.gml(fileObj.url)
+                .on('ready', function() {
+                    console.log("Caricamento completato per " + fileObj.url);
+                    this.eachLayer(function(layer) {
+                        layer.bindPopup(fileObj.url);
+                    });
+                    this.addTo(map);
+                })
+                .on('error', function(e) {
+                    console.error("Errore nel caricamento di " + fileObj.url, e);
+                });
+        });
+
+        // Prova a caricare un file GML di esempio
+        /*
+        var exampleGmlUrl = 'path/to/example.gml';
+        console.log("Caricamento file GML di esempio:", exampleGmlUrl);
+        omnivore.gml(exampleGmlUrl)
+            .on('ready', function() {
+                console.log("Caricamento completato per il file GML di esempio");
+                this.eachLayer(function(layer) {
+                    layer.bindPopup(exampleGmlUrl);
+                });
+                this.addTo(map);
+            })
+            .on('error', function(e) {
+                console.error("Errore nel caricamento del file GML di esempio", e);
+            });
+        */
+    </script>
+    <div style="text-align: center; margin-top: 10px;">
+        <a class="button is-link" href="/">Torna alla Home</a>
+    </div>
+
+    <!-- Box per il log -->
+    <div id="log-container" class="box" style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
+        <progress id="downloadProgress" class="progress is-primary" value="0" max="100" style="display:none"></progress>
+        <pre id="logContent"></pre>
+    </div>
+    <div class="buttons" style="margin-top: 1rem; text-align: center;">
+        <button class="button is-info" onclick="copyLogs()">Copia Log</button>
+    </div>
+
+    <script>
+        function updateLogs() {
+            fetch('/logs')
+                .then(response => response.json())
+                .then(data => {
+                    const logContent = document.getElementById('logContent');
+                    const progress = document.getElementById('downloadProgress');
+                    logContent.textContent = data.logs.reverse().join('\n'); // Inverti l'ordine dei log
+                    logContent.scrollTop = 0; // Scorri in alto per mostrare i log più recenti
+                    
+                    if (typeof data.progress === 'number') {
+                        progress.value = data.progress;
+                        if (data.progress === 100) {
+                            setTimeout(() => {
+                                progress.style.display = 'none';
+                            }, 2000);
+                        }
+                    }
+                });
+        }
+
+        function copyLogs() {
+            const logContent = document.getElementById('logContent').innerText;
+            navigator.clipboard.writeText(logContent).then(() => {
+                alert('Log copiati negli appunti.');
+            }).catch(err => {
+                alert('Errore durante la copia: ' + err);
+            });
+        }
+
+        // Aggiorna i log ogni secondo
+        setInterval(updateLogs, 1000);
+    </script>
+</body>
+</html>
