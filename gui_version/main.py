@@ -94,6 +94,54 @@ def download_with_progress(url, zip_path):
         raise
 
 
+def extract_all_zips(root_dir):
+    """
+    Estrae ricorsivamente tutti i file ZIP contenuti in root_dir.
+    Restituisce True se l'estrazione ha modificato la struttura (cioè se sono stati processati ZIP).
+    """
+    extraction_done = False
+    for root, _, files in os.walk(root_dir):
+        for file in files:
+            if file.endswith(".zip"):
+                zip_path = os.path.join(root, file)
+                try:
+                    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                        contents = zip_ref.namelist()
+                        log_manager.append(f"Contenuto ZIP: {contents}")
+                        zip_ref.extractall(root)
+                        log_manager.append(f"Estratto contenuto di: {file}")
+                    os.remove(zip_path)
+                    log_manager.append(f"Rimosso ZIP: {file}")
+                    extraction_done = True
+                except Exception as e:
+                    log_manager.append(f"Errore nell'estrazione di {file}: {str(e)}")
+    return extraction_done
+
+def process_gml(root_dir, fogli_dir, mappali_dir):
+    """
+    Cerca in root_dir tutti i file GML e li copia nelle directory di destinazione.
+    Restituisce il totale dei file GML processati.
+    """
+    total_gml = 0
+    for root, _, files in os.walk(root_dir):
+        for file in files:
+            if file.endswith(".gml"):
+                file_path = os.path.join(root, file)
+                try:
+                    if "_ple.gml" in file:
+                        dest = os.path.join(fogli_dir, file)
+                        shutil.copy2(file_path, dest)
+                        total_gml += 1
+                        log_manager.append(f"Copiato foglio: {file}")
+                    elif "_map.gml" in file:
+                        dest = os.path.join(mappali_dir, file)
+                        shutil.copy2(file_path, dest)
+                        total_gml += 1
+                        log_manager.append(f"Copiato mappale: {file}")
+                except Exception as e:
+                    log_manager.append(f"Errore nella copia di {file}: {str(e)}")
+    return total_gml
+
 def download_and_process(regioni):
     total_regioni = len(regioni)
     processed_regioni = 0
@@ -140,52 +188,15 @@ def download_and_process(regioni):
             zip_ref.extractall(extract_dir)
         log_manager.append(f"Estratto: {zip_path}")
 
-    # Estrazione file provinciali e comunali con estrazione ricorsiva dei file ZIP
+    # Estrazione ricorsiva dei file ZIP provinciali/comunali
     log_manager.append("Elaborazione file provinciali e comunali...")
-    total_gml = 0
+    extraction_done = True
+    while extraction_done:
+        extraction_done = extract_all_zips(f"{root_dir}/temp_extract")
 
-    extraction_needed = True
-    while extraction_needed:
-        extraction_needed = False
-        for root, _, files in os.walk(f"{root_dir}/temp_extract"):
-            for file in files:
-                if file.endswith(".zip"):
-                    zip_path = os.path.join(root, file)
-                    log_manager.append(f"Elaborazione ZIP: {file}")
-                    
-                    try:
-                        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                            contents = zip_ref.namelist()
-                            log_manager.append(f"Contenuto ZIP: {contents}")
-                            zip_ref.extractall(root)
-                            log_manager.append(f"Estratto contenuto di: {file}")
-                        os.remove(zip_path)
-                        log_manager.append(f"Rimosso ZIP: {file}")
-                        extraction_needed = True  # Aggiorna in caso di nuovi ZIP
-                    except Exception as e:
-                        log_manager.append(f"Errore nell'estrazione di {file}: {str(e)}")
-
-    # Cerca tutti i file GML nelle directory estratte
+    # Processa i file GML
     log_manager.append("Ricerca file GML in tutte le directory...")
-    for root, _, files in os.walk(f"{root_dir}/temp_extract"):
-        for file in files:
-            if file.endswith(".gml"):
-                file_path = os.path.join(root, file)
-                log_manager.append(f"Trovato GML: {file}")
-                try:
-                    if "_ple.gml" in file:
-                        dest = os.path.join("catasto_italia/fogli", file)
-                        shutil.copy2(file_path, dest)
-                        total_gml += 1
-                        log_manager.append(f"Copiato foglio: {file}")
-                    elif "_map.gml" in file:
-                        dest = os.path.join("catasto_italia/mappali", file)
-                        shutil.copy2(file_path, dest)
-                        total_gml += 1
-                        log_manager.append(f"Copiato mappale: {file}")
-                except Exception as e:
-                    log_manager.append(f"Errore nella copia di {file}: {str(e)}")
-
+    total_gml = process_gml(f"{root_dir}/temp_extract", "catasto_italia/fogli", "catasto_italia/mappali")
     log_manager.append(f"Totale file GML processati: {total_gml}")
 
     # Pulizia directory temporanee
