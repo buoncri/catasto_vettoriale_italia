@@ -1,206 +1,179 @@
 <!DOCTYPE html>
-<html lang="en" >
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <title>Download Catasto Vettoriale Italia</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-    <!-- Bulma Version 1-->
     <link rel="stylesheet" href="https://unpkg.com/bulma@1.0.2/css/bulma.min.css" />
-    <!-- <link rel='stylesheet' href="../css/prism.css">
-    <link rel="stylesheet" href="../css/cheatsheet.css"> -->
     <script src="https://kit.fontawesome.com/7dc3015a44.js" crossorigin="anonymous"></script>
-  </head>
-    <body>
-
-        <section class="hero is-primary">
+</head>
+<body>
+    <section class="hero is-primary">
         <div class="hero-body">
             <div class="columns">
-            <div class="column is-12">
-                <div class="container content">
-                <i class="is-large fab fa-discord"></i>
-                <i class="is-large fas fa-code"></i>
-                <h1 class="title">Catasto <em>Vettoriale</em> Italia</h1>
-                <h3 class="subtitle">
-                Download dei dati grafici del Catasto Italiano
-                <a href="https://geodati.gov.it/geoportale/visualizzazione-metadati/scheda-metadati/?uuid=age%3AS_0000_ITALIA" target="_blank">
-                    (Metadati)
-                </a>
-                </h3>
+                <div class="column is-12">
+                    <div class="container content">
+                        <i class="is-large fab fa-discord"></i>
+                        <i class="is-large fas fa-code"></i>
+                        <h1 class="title">Catasto <em>Vettoriale</em> Italia</h1>
+                        <h3 class="subtitle">
+                            Download dei dati grafici del Catasto Italiano
+                            <a href="https://geodati.gov.it/geoportale/visualizzazione-metadati/scheda-metadati/?uuid=age%3AS_0000_ITALIA" target="_blank">
+                                (Metadati)
+                            </a>
+                        </h3>
+                    </div>
                 </div>
             </div>
-            </div>
         </div>
-        </section>
+    </section>
 
-        <section class="section">
+    <section class="section">
         <div class="container">
             <div class="columns">
-            <div class="column is-12">
-                <div class="content">
-                <h3 class="title is-3">Scarica i dati grafici del Catasto Italiano</h3>
-                <form id="downloadForm" method="post" onsubmit="submitForm(event)">
-                    <label for="regioni">Seleziona le regioni:</label><br>
-                    <div class="columns">
-                        <div class="column">
-                            <input type="checkbox" id="abruzzo" name="regioni" value="ABRUZZO">
-                            <label for="abruzzo">Abruzzo</label><br>
-                            <input type="checkbox" id="basilicata" name="regioni" value="BASILICATA">
-                            <label for="basilicata">Basilicata</label><br>
-                            <input type="checkbox" id="calabria" name="regioni" value="CALABRIA">
-                            <label for="calabria">Calabria</label><br>
-                            <input type="checkbox" id="campania" name="regioni" value="CAMPANIA">
-                            <label for="campania">Campania</label><br>
-                            <input type="checkbox" id="emilia" name="regioni" value="EMILIA">
-                            <label for="emilia">Emilia-Romagna</label><br>
-                        </div>
-                        <div class="column">
-                            <input type="checkbox" id="friuli" name="regioni" value="FRIULI">
-                            <label for="friuli">Friuli-Venezia Giulia</label><br>
-                            <input type="checkbox" id="lazio" name="regioni" value="LAZIO">
-                            <label for="lazio">Lazio</label><br>
-                            <input type="checkbox" id="liguria" name="regioni" value="LIGURIA">
-                            <label for="liguria">Liguria</label><br>
-                            <input type="checkbox" id="lombardia" name="regioni" value="LOMBARDIA">
-                            <label for="lombardia">Lombardia</label><br>
-                            <input type="checkbox" id="marche" name="regioni" value="MARCHE">
-                            <label for="marche">Marche</label><br>
-                        </div>
-                        <div class="column">
-                            <input type="checkbox" id="molise" name="regioni" value="MOLISE">
-                            <label for="molise">Molise</label><br>
-                            <input type="checkbox" id="piemonte" name="regioni" value="PIEMONTE">
-                            <label for="piemonte">Piemonte</label><br>
-                            <input type="checkbox" id="puglia" name="regioni" value="PUGLIA">
-                            <label for="puglia">Puglia</label><br>
-                            <input type="checkbox" id="sardegna" name="regioni" value="SARDEGNA">
-                            <label for="sardegna">Sardegna</label><br>
-                            <input type="checkbox" id="sicilia" name="regioni" value="SICILIA">
-                            <label for="sicilia">Sicilia</label><br>
-                        </div>
-                        <div class="column">
-                            <input type="checkbox" id="toscana" name="regioni" value="TOSCANA">
-                            <label for="toscana">Toscana</label><br>
-                            <input type="checkbox" id="trentino" name="regioni" value="TRENTINO">
-                            <label for="trentino">Trentino-Alto Adige</label><br>
-                            <input type="checkbox" id="umbria" name="regioni" value="UMBRIA">
-                            <label for="umbria">Umbria</label><br>
-                            <input type="checkbox" id="valle" name="regioni" value="VALLE">
-                            <label for="valle">Valle d'Aosta</label><br>
-                            <input type="checkbox" id="veneto" name="regioni" value="VENETO">
-                            <label for="veneto">Veneto</label><br>
+                <div class="column is-12">
+                    <div class="content">
+                        <h3 class="title is-3">Scarica i dati grafici del Catasto Italiano</h3>
+                        <form id="downloadForm" method="post" onsubmit="submitForm(event)">
+                            <label for="regioni">Seleziona le regioni:</label><br>
+                            <div class="columns">
+                                <div class="column">
+                                    <input type="checkbox" id="abruzzo" name="regioni" value="ABRUZZO">
+                                    <label for="abruzzo">Abruzzo</label><br>
+                                    <input type="checkbox" id="basilicata" name="regioni" value="BASILICATA">
+                                    <label for="basilicata">Basilicata</label><br>
+                                    <input type="checkbox" id="calabria" name="regioni" value="CALABRIA">
+                                    <label for="calabria">Calabria</label><br>
+                                    <input type="checkbox" id="campania" name="regioni" value="CAMPANIA">
+                                    <label for="campania">Campania</label><br>
+                                    <input type="checkbox" id="emilia" name="regioni" value="EMILIA">
+                                    <label for="emilia">Emilia-Romagna</label><br>
+                                </div>
+                                <div class="column">
+                                    <input type="checkbox" id="friuli" name="regioni" value="FRIULI">
+                                    <label for="friuli">Friuli-Venezia Giulia</label><br>
+                                    <input type="checkbox" id="lazio" name="regioni" value="LAZIO">
+                                    <label for="lazio">Lazio</label><br>
+                                    <input type="checkbox" id="liguria" name="regioni" value="LIGURIA">
+                                    <label for="liguria">Liguria</label><br>
+                                    <input type="checkbox" id="lombardia" name="regioni" value="LOMBARDIA">
+                                    <label for="lombardia">Lombardia</label><br>
+                                    <input type="checkbox" id="marche" name="regioni" value="MARCHE">
+                                    <label for="marche">Marche</label><br>
+                                </div>
+                                <div class="column">
+                                    <input type="checkbox" id="molise" name="regioni" value="MOLISE">
+                                    <label for="molise">Molise</label><br>
+                                    <input type="checkbox" id="piemonte" name="regioni" value="PIEMONTE">
+                                    <label for="piemonte">Piemonte</label><br>
+                                    <input type="checkbox" id="puglia" name="regioni" value="PUGLIA">
+                                    <label for="puglia">Puglia</label><br>
+                                    <input type="checkbox" id="sardegna" name="regioni" value="SARDEGNA">
+                                    <label for="sardegna">Sardegna</label><br>
+                                    <input type="checkbox" id="sicilia" name="regioni" value="SICILIA">
+                                    <label for="sicilia">Sicilia</label><br>
+                                </div>
+                                <div class="column">
+                                    <input type="checkbox" id="toscana" name="regioni" value="TOSCANA">
+                                    <label for="toscana">Toscana</label><br>
+                                    <input type="checkbox" id="trentino" name="regioni" value="TRENTINO">
+                                    <label for="trentino">Trentino-Alto Adige</label><br>
+                                    <input type="checkbox" id="umbria" name="regioni" value="UMBRIA">
+                                    <label for="umbria">Umbria</label><br>
+                                    <input type="checkbox" id="valle" name="regioni" value="VALLE-AOSTA">
+                                    <label for="valle">Valle d'Aosta</label><br>
+                                    <input type="checkbox" id="veneto" name="regioni" value="VENETO">
+                                    <label for="veneto">Veneto</label><br>
+                                </div>
+                            </div>
+                            <br>
+                            <button type="submit" class="button is-primary">Scarica ed Elabora</button>
+                            <button type="reset" class="button is-light">Azzera selezione</button>
+                            <button type="button" class="button is-warning" onclick="clearLogs()">Pulisci Log</button>
+                            <button type="button" class="button is-danger" onclick="cleanupDirectories()">Cancella Directory</button>
+                        </form>
+
+                        <div id="log-container" class="box" style="max-height: 400px; overflow-y: auto;">
+                            <progress id="downloadProgress" class="progress is-primary" value="0" max="100" style="display:none"></progress>
+                            <pre id="logContent"></pre>
                         </div>
                     </div>
-                    <br>
-                    <button type="submit" class="button is-primary">Scarica ed Elabora</button>
-                    <button type="reset" class="button is-light">Azzera selezione</button>
-                    <button type="button" class="button is-warning" onclick="clearLogs()">Pulisci Log</button>
-                    <button type="button" class="button is-danger" onclick="cleanupDirectories()">Cancella Directory</button>
-                </form>
-
-                <div id="log-container" class="box" style="max-height: 400px; overflow-y: auto;">
-                    <progress id="downloadProgress" class="progress is-primary" value="0" max="100" style="display:none"></progress>
-                    <pre id="logContent"></pre>
                 </div>
-
-                </div>
-            </div>
             </div>
         </div>
-        </section>
+    </section>
 
-        <footer class="footer">
-            <hr>
-            <div class="columns is-mobile is-centered">
-                <div class="field is-grouped is-grouped-multiline">
-                    <div class="control">
-                        <div class="tags has-addons">
-                            <a class="tag is-link" href="https://github.com/buoncri/catasto_vettoriale_italia">
-                                Github Project
-                            </a>
-                            <span class="tag is-info">MIT license</span>
-                        </div>
+    <footer class="footer">
+        <hr>
+        <div class="columns is-mobile is-centered">
+            <div class="field is-grouped is-grouped-multiline">
+                <div class="control">
+                    <div class="tags has-addons">
+                        <a class="tag is-link" href="https://github.com/buoncri/catasto_vettoriale_italia">Github Project</a>
+                        <span class="tag is-info">MIT license</span>
                     </div>
                 </div>
             </div>
-        </footer>
+        </div>
+    </footer>
 
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.js'></script>
-        <script>
-            window.addEventListener('resize', () => {
-            const divs = document.querySelectorAll(".menu-list");
-            if (window.innerWidth < 768){
-                divs.forEach(div => div.classList.add("tags"));
-            }
-            else {
-                divs.forEach(div => div.classList.remove("tags"));
-            }
+    <script>
+        function clearLogs() {
+            fetch('/clear_logs', {method: 'POST'})
+                .then(() => updateLogs());
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            const form = document.getElementById('downloadForm');
+            const formData = new FormData(form);
+            const progress = document.getElementById('downloadProgress');
+            progress.style.display = 'block';
+            progress.value = 0;
+            
+            fetch('/', {
+                method: 'POST',
+                body: formData
             });
+        }
 
-            document.addEventListener("DOMContentLoaded", function() {
-                //The first argument are the elements to which the plugin shall be initialized
-                //The second argument has to be at least a empty object or a object with your desired options
-                OverlayScrollbars(document.querySelectorAll("body"), { });
-            });
-        </script>
-
-        <script>
-            function clearLogs() {
-                fetch('/clear_logs', {method: 'POST'})
-                    .then(() => updateLogs());
-            }
-
-            function submitForm(event) {
-                event.preventDefault();
-                const form = document.getElementById('downloadForm');
-                const formData = new FormData(form);
-                const progress = document.getElementById('downloadProgress');
-                progress.style.display = 'block';
-                progress.value = 0;
-                
-                fetch('/', {
-                    method: 'POST',
-                    body: formData
+        function updateLogs() {
+            fetch('/logs')
+                .then(response => response.json())
+                .then(data => {
+                    const logContent = document.getElementById('logContent');
+                    const progress = document.getElementById('downloadProgress');
+                    logContent.textContent = data.logs.join('\n');
+                    logContent.scrollTop = logContent.scrollHeight;
+                    
+                    if (typeof data.progress === 'number') {
+                        progress.value = data.progress;
+                        if (data.progress === 100) {
+                            setTimeout(() => {
+                                progress.style.display = 'none';
+                            }, 2000);
+                        }
+                    }
                 });
-            }
+        }
 
-            function updateLogs() {
-                fetch('/logs')
+        function cleanupDirectories() {
+            if (confirm('Sei sicuro di voler cancellare tutte le directory e i file scaricati?')) {
+                fetch('/cleanup', {method: 'POST'})
                     .then(response => response.json())
                     .then(data => {
-                        const logContent = document.getElementById('logContent');
-                        const progress = document.getElementById('downloadProgress');
-                        logContent.textContent = data.logs.join('\n');
-                        logContent.scrollTop = logContent.scrollHeight;
-                        
-                        if (typeof data.progress === 'number') {
-                            progress.value = data.progress;
-                            if (data.progress === 100) {
-                                setTimeout(() => {
-                                    progress.style.display = 'none';
-                                }, 2000);
-                            }
+                        if (data.success) {
+                            alert('Directory cancellate con successo!');
+                        } else {
+                            alert('Errore durante la cancellazione: ' + data.error);
                         }
                     });
             }
+        }
 
-            // Aggiorna i log ogni secondo
-            setInterval(updateLogs, 1000);
-
-            function cleanupDirectories() {
-                if (confirm('Sei sicuro di voler cancellare tutte le directory e i file scaricati?')) {
-                    fetch('/cleanup', {method: 'POST'})
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Directory cancellate con successo!');
-                            } else {
-                                alert('Errore durante la cancellazione: ' + data.error);
-                            }
-                        });
-                }
-            }
-        </script>
-
-    </body>
+        // Aggiorna i log ogni secondo
+        setInterval(updateLogs, 1000);
+    </script>
+</body>
 </html>

@@ -42,6 +42,7 @@ class LogManager:
 
 log_manager = LogManager()
 
+
 def download_with_progress(url, zip_path):
     try:
         log_manager.append(f"Tentativo di download da: {url}")
@@ -92,6 +93,7 @@ def download_with_progress(url, zip_path):
             os.remove(zip_path)
         raise
 
+
 def download_and_process(regioni):
     total_regioni = len(regioni)
     processed_regioni = 0
@@ -100,14 +102,17 @@ def download_and_process(regioni):
     regioni_speciali = {
         "EMILIA": "EMILIA-ROMAGNA",
         "FRIULI": "FRIULI-VENEZIA-GIULIA",
+        "AOSTA": "VALLE-AOSTA",
+        "VALLE D'AOSTA": "VALLE-AOSTA",
+        "VALDAOSTA": "VALLE-AOSTA",
     }
 
     # Creazione directory necessarie
     root_dir = "catasto_italia/tmp_folder"
-    os.makedirs(f"{root_dir}/ple_files", exist_ok=True)
-    os.makedirs(f"{root_dir}/map_files", exist_ok=True)
     os.makedirs(f"{root_dir}/temp_extract", exist_ok=True)
     os.makedirs("catasto_italia/sorgenti", exist_ok=True)
+    os.makedirs("catasto_italia/fogli", exist_ok=True)
+    os.makedirs("catasto_italia/mappali", exist_ok=True)
 
     for regione in regioni:
         regione = regioni_speciali.get(regione, regione)
@@ -124,58 +129,94 @@ def download_and_process(regioni):
             log_manager.append(f"Errore durante il download di {regione}: {e}")
             continue
 
-        # Sposta il file ZIP nella cartella sorgenti
+        # Sposta il file ZIP Regionale nella cartella sorgenti
         log_manager.append(f"Spostamento file Regione: {regione}")
         shutil.move(zip_path, f"catasto_italia/sorgenti/{zip_path}")
 
         # Estrai i file ZIP
         extract_dir = f"{root_dir}/temp_extract/{regione}"
         with zipfile.ZipFile(f"catasto_italia/sorgenti/{zip_path}", "r") as zip_ref:
+            log_manager.append(f"Inizio unzip file: {zip_ref.filename}")
             zip_ref.extractall(extract_dir)
         log_manager.append(f"Estratto: {zip_path}")
 
-    # Estrazione file provinciali e comunali
+    # Estrazione file provinciali e comunali con estrazione ricorsiva dei file ZIP
     log_manager.append("Elaborazione file provinciali e comunali...")
+    total_gml = 0
+
+    extraction_needed = True
+    while extraction_needed:
+        extraction_needed = False
+        for root, _, files in os.walk(f"{root_dir}/temp_extract"):
+            for file in files:
+                if file.endswith(".zip"):
+                    zip_path = os.path.join(root, file)
+                    log_manager.append(f"Elaborazione ZIP: {file}")
+                    
+                    try:
+                        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                            contents = zip_ref.namelist()
+                            log_manager.append(f"Contenuto ZIP: {contents}")
+                            zip_ref.extractall(root)
+                            log_manager.append(f"Estratto contenuto di: {file}")
+                        os.remove(zip_path)
+                        log_manager.append(f"Rimosso ZIP: {file}")
+                        extraction_needed = True  # Aggiorna in caso di nuovi ZIP
+                    except Exception as e:
+                        log_manager.append(f"Errore nell'estrazione di {file}: {str(e)}")
+
+    # Cerca tutti i file GML nelle directory estratte
+    log_manager.append("Ricerca file GML in tutte le directory...")
     for root, _, files in os.walk(f"{root_dir}/temp_extract"):
         for file in files:
-            if file.endswith(".zip"):
-                with zipfile.ZipFile(os.path.join(root, file), "r") as zip_ref:
-                    zip_ref.extractall(root)
-                log_manager.append(f"Estrazione file: {file}")
+            if file.endswith(".gml"):
+                file_path = os.path.join(root, file)
+                log_manager.append(f"Trovato GML: {file}")
+                try:
+                    if "_ple.gml" in file:
+                        dest = os.path.join("catasto_italia/fogli", file)
+                        shutil.copy2(file_path, dest)
+                        total_gml += 1
+                        log_manager.append(f"Copiato foglio: {file}")
+                    elif "_map.gml" in file:
+                        dest = os.path.join("catasto_italia/mappali", file)
+                        shutil.copy2(file_path, dest)
+                        total_gml += 1
+                        log_manager.append(f"Copiato mappale: {file}")
+                except Exception as e:
+                    log_manager.append(f"Errore nella copia di {file}: {str(e)}")
 
-    # Organizza i file GML
-    log_manager.append("Elaborazione file GML...")
-    for root, _, files in os.walk(f"{root_dir}/temp_extract"):
-        for file in files:
-            if file.endswith("_ple.gml"):
-                shutil.move(os.path.join(root, file), f"{root_dir}/ple_files/{file}")
-                log_manager.append(f"Spostato PLE: {file}")
-            elif file.endswith("_map.gml"):
-                shutil.move(os.path.join(root, file), f"{root_dir}/map_files/{file}")
-                log_manager.append(f"Spostato MAP: {file}")
+    log_manager.append(f"Totale file GML processati: {total_gml}")
 
-    # Sposta le directory finali
-    shutil.move(f"{root_dir}/ple_files", "catasto_italia/ple_files")
-    shutil.move(f"{root_dir}/map_files", "catasto_italia/map_files")
-    shutil.rmtree(root_dir)
-    log_manager.append("Pulizia cartelle temporanee completata.")
+    # Pulizia directory temporanee
+    try:
+        shutil.rmtree(root_dir)
+        log_manager.append("Pulizia cartelle temporanee completata")
+    except Exception as e:
+        log_manager.append(f"Errore durante la pulizia: {str(e)}")
 
-    ple_count = len(os.listdir("catasto_italia/ple_files"))
-    map_count = len(os.listdir("catasto_italia/map_files"))
-    log_manager.append("Elaborazione completata!")
-    log_manager.append("------------")
-    log_manager.append(f"File in ple_files: {ple_count}")
-    log_manager.append(f"File in map_files: {map_count}")
+    # Verifica finale
+    try:
+        fogli_count = len(os.listdir("catasto_italia/fogli"))
+        mappali_count = len(os.listdir("catasto_italia/mappali"))
+        log_manager.append("Elaborazione completata!")
+        log_manager.append("------------")
+        log_manager.append(f"Fogli catastali trovati: {fogli_count}")
+        log_manager.append(f"Mappali catastali trovati: {mappali_count}")
+    except Exception as e:
+        log_manager.append(f"Errore nel conteggio finale: {str(e)}")
 
 
 @app.route("/logs", methods=["GET"])
 def get_logs():
     return jsonify(logs=log_manager.get_logs(), progress=log_manager.progress)
 
+
 @app.route("/clear_logs", methods=["POST"])
 def clear_logs():
     log_manager.clear()
     return jsonify(success=True)
+
 
 @app.route("/cleanup", methods=["POST"])
 def cleanup_directories():
@@ -183,8 +224,8 @@ def cleanup_directories():
         # Lista delle directory da cancellare
         dirs_to_clean = [
             "catasto_italia/tmp_folder",
-            "catasto_italia/ple_files",
-            "catasto_italia/map_files",
+            "catasto_italia/fogli",
+            "catasto_italia/mappali",
             "catasto_italia/sorgenti"
         ]
         
@@ -203,6 +244,7 @@ def cleanup_directories():
     except Exception as e:
         return jsonify(success=False, error=str(e))
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -210,6 +252,7 @@ def index():
         threading.Thread(target=download_and_process, args=(regioni,)).start()
         return jsonify(success=True)
     return render_template("index.html", log_messages=log_manager.get_logs())
+
 
 
 if __name__ == "__main__":
