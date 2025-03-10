@@ -64,10 +64,10 @@ find "$root_dir/temp_extract" -name '*.gml' | while read G; do
     
     if [[ "$filename" == *_ple.gml ]]; then
         echo "Spostando PLE: $filename"
-        mv "$G" "$root_dir/ple_files/"
+        mv "$G" "$root_dir/map_files/"  # Invertito
     elif [[ "$filename" == *_map.gml ]]; then
         echo "Spostando MAP: $filename"
-        mv "$G" "$root_dir/map_files/"
+        mv "$G" "$root_dir/ple_files/"  # Invertito
     fi
 done    
 

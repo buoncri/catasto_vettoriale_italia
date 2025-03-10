@@ -61,8 +61,8 @@ for /r "%root_dir%\temp_extract" %%F in (*.zip) do (
 echo Elaborazione file GML...
 for /r "%root_dir%\temp_extract" %%G in (*.gml) do (
     echo Analizzando: %%~nxG
-    if "%%~nxG"=="*_ple.gml" move "%%G" "%root_dir%\ple_files"
-    if "%%~nxG"=="*_map.gml" move "%%G" "%root_dir%\map_files"
+    if "%%~nxG"=="*_ple.gml" move "%%G" "%root_dir%\map_files"  # Invertito
+    if "%%~nxG"=="*_map.gml" move "%%G" "%root_dir%\ple_files"  # Invertito
 )
 
 :: Sposta le cartelle finali
